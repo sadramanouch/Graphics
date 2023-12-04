@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Assignment 4: Shading, Texturing, and Transforming Triangle Meshes!</title>
+    <link rel="stylesheet" href="webgl.css" type="text/css">
+    <script type="module">
+      const urlParams = new URLSearchParams(window.location.search);
+      const saveImageFilename = urlParams.get('saveImage');
+      const urlInput = urlParams.get('input');
+      const codeFile = urlParams.get('codeFile') || './a4.js';
+      const { Parser, Scene, Renderer, TriangleMesh, DEF_INPUT } = await import(codeFile);
+
+      document.getElementById("text-input").value = DEF_INPUT;
+      let canvas = document.getElementById('gl-canvas');
+      let renderer = new Renderer({canvas: canvas});
+      let parser = new Parser();
+
+      function update() {
+        const input = urlInput || document.getElementById("text-input").value;
+        let scene = new Scene();
+        parser.parse(input, scene);
+        renderer.render(scene).then(() => {
+          if (saveImageFilename) {
+            renderer.saveImage(saveImageFilename);
+          }
+        });
+      }
+
+      window.update = update;
+      update();
+    </script>
+  </head>
+  <body>
+    <h2>Assignment 4: Shading, Texturing, and Transforming Triangle Meshes!</h2>
+    <canvas id="gl-canvas" width="512" height="512" style="display: inline-block; vertical-align: top;"></canvas>
+    <div style="display: inline-block; vertical-align: top; max-width: 600px;">
+      <label for="text-input">
+        <strong>Input syntax:</strong><br>
+          <table>
+            <tr><td><i>Primitives & shading materials</i></td><td></td></tr>
+            <tr><td><strong>p,id,cube;</strong></td><td>= create cube named by id</td></tr>
+            <tr><td><strong>p,id,sphere,i,j;</strong></td><td>= create sphere named by id, using i number of stacks, and j number of sectors</td></tr>
+            <tr><td><strong>m,id,ka,kd,ks,shininess,texture;</strong></td><td>= create material named by id, with ambient (ka), diffuse (kd), specular (ks), and shininess coefficients, and optional texture image (texture).</td></tr>
+            <tr><td><i>Transformations</i></td><td></td></tr>
+            <tr><td><strong>X,id,T,x,y,z;</strong></td><td>= Translate object id by (x,y,z)</td></tr>
+            <tr><td><strong>X,id,R?,theta;</strong></td><td>= Rotate object id around axis ? (? = x,y,z) by counter-clockwise angle in degrees (theta)</td></tr>
+            <tr><td><strong>X,id,S,x,y,z;</strong></td><td>= Scale object id by (x,y,z)</td></tr>
+            <tr><td><i>Objects, lights, cameras</i></td><td></td></tr>
+            <tr><td><strong>o,id,prim,mat;</strong></td><td>Add object named by id, specified primitive mesh id (prim) and material id (mat).</td></tr>
+            <tr><td><strong>l,id,type,x,y,z,ir,ig,ib;</strong></td><td>Set light at position (x,y,z) with intensity (ir,ig,ib) </td></tr>
+            <tr><td><strong>c,id,type,ex,ey,ez,lx,ly,lz,ux,uy,uz;</strong></td><td>Set camera to be placed at position (ex,ey,ez) and looking towards (lx,ly,lz) with up axis (ux,uy,uz).</td></tr>
+          </table><br>
+          The default camera is looking at the world origin (0,0,0) from point (5, 5, 5) with the +y axis pointing up and the -z axis pointing away.<br>
+          Edit input text, and press "<strong>Update</strong>" button to refresh!
+      </label>
+      <textarea id="text-input" name="text-input" rows="25" cols="60"></textarea><br><br><br>
+      <button type="button" onclick="window.update()">Update</button>
+    </div>
+  </body>
+</html>
